@@ -66,7 +66,7 @@ export default function App() {
       `;
 
       const response = await ai.models.generateContent({
-        model: 'gemini-2.0-flash',
+        model: 'gemini-2.5-flash',
         contents: prompt,
         config: {
           systemInstruction: `You are a Senior Software Architect and CTO with 20+ years of experience in system design and infrastructure. Your expertise covers Frontend (Web/Mobile), Backend (Monolithic/Microservices), Database Design (SQL/NoSQL), DevOps (CI/CD, Cloud Providers), and DX (Developer Experience). Your goal is to act as a 'Tech Stack Decision Helper' for users who are starting new software projects.
