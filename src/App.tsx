@@ -5,9 +5,11 @@ import remarkGfm from 'remark-gfm';
 import { Loader2, Send, Server, Database, Layout, Code2, Moon, Sun } from 'lucide-react';
 import { motion } from 'motion/react';
 
-const ai = new GoogleGenAI({ apiKey: process.env.GEMINI_API_KEY });
-
 export default function App() {
+  // --- YENİ EKLENEN API KEY STATE'LERİ ---
+  const [apiKey, setApiKey] = useState<string>(localStorage.getItem('gemini_api_key') || '');
+  const [showKeyInput, setShowKeyInput] = useState<boolean>(!localStorage.getItem('gemini_api_key'));
+
   const [isDarkMode, setIsDarkMode] = useState(false);
   const [description, setDescription] = useState('');
   const [complexity, setComplexity] = useState('Simple CRUD');
@@ -25,15 +27,35 @@ export default function App() {
     }
   }, [isDarkMode]);
 
+  // --- API KEY KAYDETME FONKSİYONU ---
+  const handleSaveKey = (e: React.FormEvent) => {
+    e.preventDefault();
+    const target = e.target as any;
+    const key = target.elements.apiKey.value;
+    if (key) {
+      localStorage.setItem('gemini_api_key', key);
+      setApiKey(key);
+      setShowKeyInput(false);
+    }
+  };
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!description.trim()) return;
+
+    if (!apiKey) {
+      setError('API Key bulunamadı. Lütfen sayfayı yenileyip anahtarınızı girin.');
+      return;
+    }
 
     setLoading(true);
     setError('');
     setResult('');
 
     try {
+      // API'yi kullanıcının girdiği key ile başlatıyoruz
+      const ai = new GoogleGenAI({ apiKey: apiKey });
+
       const prompt = `
         Project Description: ${description}
         Complexity: ${complexity}
@@ -69,12 +91,44 @@ Tone: Professional, objective, encouraging. Avoid hype-driven development. Provi
 
       setResult(response.text || '');
     } catch (err: any) {
-      setError(err.message || 'An error occurred while generating the recommendation.');
+      setError(err.message || 'An error occurred while generating the recommendation. Please check your API Key.');
     } finally {
       setLoading(false);
     }
   };
 
+  // --- API KEY GİRİŞ EKRANI (Anahtar yoksa gösterilecek) ---
+  if (showKeyInput) {
+    return (
+      <div className="min-h-screen flex items-center justify-center bg-slate-900 p-4 font-sans">
+        <div className="bg-white p-8 rounded-2xl shadow-2xl max-w-md w-full">
+          <div className="flex justify-center mb-6">
+            <div className="bg-indigo-100 p-3 rounded-full">
+              <Code2 className="w-8 h-8 text-indigo-600" />
+            </div>
+          </div>
+          <h2 className="text-2xl font-bold mb-2 text-center text-slate-800">Gemini API Key</h2>
+          <p className="text-slate-500 mb-6 text-center text-sm">
+            Projenin çalışması için lütfen API anahtarını gir. Bu anahtar sadece senin tarayıcında saklanır, sunucuya gönderilmez.
+          </p>
+          <form onSubmit={handleSaveKey} className="space-y-4">
+            <input
+              name="apiKey"
+              type="password"
+              placeholder="AIzaSy..."
+              className="w-full px-4 py-3 border border-slate-200 rounded-xl focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500 outline-none transition-all text-slate-900"
+              required
+            />
+            <button type="submit" className="w-full bg-indigo-600 text-white py-3 rounded-xl font-medium hover:bg-indigo-700 transition shadow-sm">
+              Kaydet ve Başlat
+            </button>
+          </form>
+        </div>
+      </div>
+    );
+  }
+
+  // --- ANA UYGULAMA ARAYÜZÜ ---
   return (
     <div className="min-h-screen bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-50 font-sans selection:bg-indigo-100 dark:selection:bg-indigo-900/50 selection:text-indigo-900 dark:selection:text-indigo-100 transition-colors duration-200">
       <header className="bg-white dark:bg-slate-900 border-b border-slate-200 dark:border-slate-800 sticky top-0 z-10 transition-colors duration-200">
@@ -99,6 +153,15 @@ Tone: Professional, objective, encouraging. Avoid hype-driven development. Provi
               aria-label="Toggle Dark Mode"
             >
               {isDarkMode ? <Sun className="w-5 h-5" /> : <Moon className="w-5 h-5" />}
+            </button>
+            <button
+              onClick={() => {
+                localStorage.removeItem('gemini_api_key');
+                window.location.reload();
+              }}
+              className="text-xs border border-red-200 dark:border-red-900/30 text-red-600 dark:text-red-400 px-2 py-1 rounded hover:bg-red-50 dark:hover:bg-red-900/20 transition-colors"
+            >
+              Key Sıfırla
             </button>
           </div>
         </div>
