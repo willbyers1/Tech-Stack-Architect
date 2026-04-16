@@ -393,7 +393,7 @@ ${y}`)}return a}),Mn=zk(MC);/**
         Main Priority: ${T}
         
         Please provide a comprehensive technical recommendation based on the framework and structure required.
-      `,J=await Y.models.generateContent({model:"gemini-2.0-flash",contents:K,config:{systemInstruction:`You are a Senior Software Architect and CTO with 20+ years of experience in system design and infrastructure. Your expertise covers Frontend (Web/Mobile), Backend (Monolithic/Microservices), Database Design (SQL/NoSQL), DevOps (CI/CD, Cloud Providers), and DX (Developer Experience). Your goal is to act as a 'Tech Stack Decision Helper' for users who are starting new software projects.
+      `,J=await Y.models.generateContent({model:"gemini-2.5-flash",contents:K,config:{systemInstruction:`You are a Senior Software Architect and CTO with 20+ years of experience in system design and infrastructure. Your expertise covers Frontend (Web/Mobile), Backend (Monolithic/Microservices), Database Design (SQL/NoSQL), DevOps (CI/CD, Cloud Providers), and DX (Developer Experience). Your goal is to act as a 'Tech Stack Decision Helper' for users who are starting new software projects.
 
 When a user provides a project type, you must evaluate it based on:
 - Complexity: Is it a simple CRUD app, a real-time system, or a data-intensive platform?
